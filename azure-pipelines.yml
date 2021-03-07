@@ -1,0 +1,61 @@
+stages:
+- stage: Validate
+  jobs:
+  - job: Validate
+    continueOnError: false
+    steps:
+    - task: TerraformInstaller@0
+      displayName: install
+      inputs:
+        terraformVersion: '0.13.6'
+    - task: TerraformTaskV1@0
+      displayName: Init
+      inputs:
+        provider: 'azurerm'
+        command: 'init'
+        backendServiceArm: 'BioH-SC'
+        backendAzureRmResourceGroupName: 'BioH-CICD'
+        backendAzureRmStorageAccountName: 'yoctopremirror'
+        backendAzureRmContainerName: 'tfcontainer'
+        backendAzureRmKey: 'terraform.tfstate'
+    - task: TerraformTaskV1@0
+      displayName: validate
+      inputs: 
+        provider: 'azurerm'
+        command: 'validate'
+- stage: Deploy
+  jobs:
+    - deployment: deploy_terraform
+      continueOnError: false
+      environment: dev
+      strategy:
+       runOnce:
+        deploy:
+          steps:
+          - checkout: self
+          - task: TerraformInstaller@0
+            displayName: install
+            inputs:
+              terraformVersion: '0.13.6'
+          - task: TerraformTaskV1@0
+            displayName: init
+            inputs:
+              provider: 'azurerm'
+              command: 'init'
+              backendServiceArm: 'BioH-SC'
+              backendAzureRmResourceGroupName: 'BioH-CICD'
+              backendAzureRmStorageAccountName: 'yoctopremirror'
+              backendAzureRmContainerName: 'tfcontainer'
+              backendAzureRmKey: 'terraform.tfstate'
+          - task: TerraformTaskV1@0
+            displayName: plan
+            inputs:
+              provider: 'azurerm'
+              command: 'plan'
+              environmentServiceNameAzureRM: 'BioH-SC'
+          - task: TerraformTaskV1@0
+            displayName: apply
+            inputs:
+              provider: 'azurerm'
+              command: 'apply'
+              environmentServiceNameAzureRM: 'BioH-SC'
