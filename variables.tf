@@ -12,3 +12,8 @@ variable "vnet" {
   type    = string
   default = ""
 }
+
+variable "script" {
+  type    = string
+  default = "./script.sh"
+}
