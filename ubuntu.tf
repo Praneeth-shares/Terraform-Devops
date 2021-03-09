@@ -67,8 +67,7 @@ resource "azurerm_virtual_machine_extension" "BioHHostname" {
 
   settings = <<SETTINGS
  {
-  "fileUris": ["https://yoctopremirror.blob.core.windows.net/selfhosted/addagent.sh"],
-  "commandToExecute": "sh ./addagent.sh"
+  "script": "${base64encode(file(var.script))}"
  }
 SETTINGS
 }
