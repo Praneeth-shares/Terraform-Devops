@@ -1,4 +1,12 @@
 # Create network interface
+terraform {
+  backend "azurerm" {
+    resource_group_name  = "BIOH-CICD"
+    storage_account_name = "yoctopremirror"
+    container_name       = "tfstate"
+    key                  = "terraform.tfstate"
+  }
+}
 
 resource "azurerm_network_interface" "BioHNic" {
   name                = "selfhostedagent-nic"
